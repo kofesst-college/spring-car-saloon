@@ -5,28 +5,26 @@ import me.kofesst.spring.carsaloon.repositories.CarsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @Controller
+@RequestMapping("/cars")
 public class CarsController {
     @Autowired
     private CarsRepository repository;
 
-    @GetMapping("/cars")
+    @GetMapping
     public String carsMain(Model model) {
         Iterable<Car> cars = repository.findAll();
         model.addAttribute("models", cars);
         return "cars/main";
     }
 
-    @PostMapping("/cars")
+    @PostMapping
     public String carsSearch(
             @RequestParam String brand,
             Model model
@@ -37,12 +35,12 @@ public class CarsController {
         return "cars/main";
     }
 
-    @GetMapping("/cars/add")
+    @GetMapping("/add")
     public String carsAdd() {
         return "cars/add";
     }
 
-    @PostMapping("/cars/add")
+    @PostMapping("/add")
     public String carsAdd(
             @RequestParam String brand,
             @RequestParam String carModel,
@@ -55,7 +53,7 @@ public class CarsController {
         return "redirect:/cars";
     }
 
-    @GetMapping("/cars/{id}")
+    @GetMapping("/{id}")
     public String carDetails(
             @PathVariable("id") Long id,
             Model model
@@ -69,7 +67,7 @@ public class CarsController {
         return "cars/details";
     }
 
-    @GetMapping("/cars/edit/{id}")
+    @GetMapping("/edit/{id}")
     public String carEdit(
             @PathVariable("id") Long id,
             Model model
@@ -83,7 +81,7 @@ public class CarsController {
         return "cars/add";
     }
 
-    @PostMapping("/cars/edit/{id}")
+    @PostMapping("/edit/{id}")
     public String carEdit(
             @PathVariable Long id,
             @RequestParam String brand,
@@ -102,7 +100,7 @@ public class CarsController {
         return "redirect:/cars/" + id;
     }
 
-    @PostMapping("/cars/delete/{id}")
+    @PostMapping("/delete/{id}")
     public String carDelete(
             @PathVariable Long id
     ) {
