@@ -1,7 +1,9 @@
 package me.kofesst.spring.carsaloon.controllers;
 
 import me.kofesst.spring.carsaloon.models.Car;
+import me.kofesst.spring.carsaloon.models.Customer;
 import me.kofesst.spring.carsaloon.repositories.CarsRepository;
+import me.kofesst.spring.carsaloon.repositories.CustomersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,6 +18,9 @@ import java.util.Optional;
 public class CarsController {
     @Autowired
     private CarsRepository repository;
+
+    @Autowired
+    private CustomersRepository customersRepository;
 
     @GetMapping
     public String carsMain(Model model) {
@@ -104,6 +109,9 @@ public class CarsController {
     public String carDelete(
             @PathVariable Long id
     ) {
+        Car car = repository.findById(id).orElseThrow();
+        Iterable<Customer> child = customersRepository.getByCar(car);
+        customersRepository.deleteAll(child);
         repository.deleteById(id);
         return "redirect:/cars";
     }

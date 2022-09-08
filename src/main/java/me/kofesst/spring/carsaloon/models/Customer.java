@@ -13,7 +13,7 @@ public class Customer {
     private String customerFirstname;
     private String customerLastname;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "carId", referencedColumnName = "id")
     private Car car;
 
