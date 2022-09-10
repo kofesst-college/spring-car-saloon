@@ -4,6 +4,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.validation.constraints.*;
 
 @Entity
 public class Car {
@@ -11,10 +12,24 @@ public class Car {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotNull(message = "Это обязательное поле")
+    @NotBlank(message = "Поле не может быть пустым")
+    @Size(min = 2, max = 20, message = "Длина значения должна быть от 2 до 20")
     private String brand;
+
+    @NotNull(message = "Это обязательное поле")
+    @NotBlank(message = "Поле не может быть пустым")
+    @Size(min = 2, max = 20, message = "Длина значения должна быть от 2 до 20")
     private String model;
+
+    @Positive(message = "Число должно быть положительным")
     private Integer maxSpeed;
+
+    @Positive(message = "Число должно быть положительным")
+    @Max(value = 100000, message = "Слишком большой вес")
     private Double weight;
+
+    @Positive(message = "Число должно быть положительным")
     private Integer price;
 
     public Car() {

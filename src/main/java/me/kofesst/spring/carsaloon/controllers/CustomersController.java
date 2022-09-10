@@ -7,8 +7,11 @@ import me.kofesst.spring.carsaloon.repositories.CustomersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+import java.util.Date;
 import java.util.Optional;
 
 @Controller
@@ -41,7 +44,9 @@ public class CustomersController {
     }
 
     @GetMapping("/add")
-    public String customersAdd(Model model) {
+    public String customersAdd(Customer customer, Model model) {
+        model.addAttribute("customer", customer);
+
         Iterable<Car> cars = carsRepository.findAll();
         model.addAttribute("cars", cars);
         return "customers/add";
@@ -49,13 +54,17 @@ public class CustomersController {
 
     @PostMapping("/add")
     public String customersAdd(
-            @RequestParam String firstname,
-            @RequestParam String lastname,
-            @RequestParam Long carId,
-            @RequestParam(required = false, defaultValue = "false") Boolean isOnline
+            @ModelAttribute("customer") @Valid Customer customer,
+            BindingResult result,
+            Model model
     ) {
-        Car car = carsRepository.findById(carId).get();
-        Customer customer = new Customer(firstname, lastname, car, isOnline);
+        if (result.hasErrors()) {
+            Iterable<Car> cars = carsRepository.findAll();
+            model.addAttribute("cars", cars);
+            return "customers/add";
+        }
+
+        customer.setTimestamp(new Date());
         customersRepository.save(customer);
         return "redirect:/customers";
     }
@@ -75,16 +84,14 @@ public class CustomersController {
     }
 
     @GetMapping("/edit/{id}")
-    public String customerEdit(
-            @PathVariable("id") Long id,
-            Model model
-    ) {
+    public String customerEdit(@PathVariable("id") Long id, Model model) {
         Optional<Customer> customer = customersRepository.findById(id);
         if (customer.isEmpty()) {
             return "redirect:/customers";
         }
 
-        model.addAttribute("edit", customer.get());
+        model.addAttribute("edit", id);
+        model.addAttribute("customer", customer.get());
 
         Iterable<Car> cars = carsRepository.findAll();
         model.addAttribute("cars", cars);
@@ -94,19 +101,17 @@ public class CustomersController {
 
     @PostMapping("/edit/{id}")
     public String customerEdit(
-            @PathVariable Long id,
-            @RequestParam String firstname,
-            @RequestParam String lastname,
-            @RequestParam Long carId,
-            @RequestParam(required = false, defaultValue = "false") Boolean isOnline
+            @PathVariable Long id, @ModelAttribute("customer") @Valid Customer customer,
+            BindingResult result, Model model
     ) {
-        Car car = carsRepository.findById(carId).orElseThrow();
+        if (result.hasErrors()) {
+            Iterable<Car> cars = carsRepository.findAll();
+            model.addAttribute("edit", id);
+            model.addAttribute("cars", cars);
+            return "customers/add";
+        }
 
-        Customer customer = customersRepository.findById(id).orElseThrow();
-        customer.setCustomerFirstname(firstname);
-        customer.setCustomerLastname(lastname);
-        customer.setCar(car);
-        customer.setOnline(isOnline);
+        customer.setTimestamp(new Date());
         customersRepository.save(customer);
         return "redirect:/customers/" + id;
     }

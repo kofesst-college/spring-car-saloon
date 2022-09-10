@@ -7,10 +7,10 @@ import me.kofesst.spring.carsaloon.repositories.CustomersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
+import javax.validation.Valid;
 import java.util.Optional;
 
 @Controller
@@ -30,10 +30,7 @@ public class CarsController {
     }
 
     @PostMapping
-    public String carsSearch(
-            @RequestParam String brand,
-            Model model
-    ) {
+    public String carsSearch(@RequestParam String brand, Model model) {
         Iterable<Car> cars = repository.getByBrandContainsIgnoreCase(brand);
         model.addAttribute("brand", brand);
         model.addAttribute("models", cars);
@@ -41,28 +38,26 @@ public class CarsController {
     }
 
     @GetMapping("/add")
-    public String carsAdd() {
+    public String carsAdd(Car car, Model model) {
+        model.addAttribute("car", car);
         return "cars/add";
     }
 
     @PostMapping("/add")
-    public String carsAdd(
-            @RequestParam String brand,
-            @RequestParam String carModel,
-            @RequestParam Integer maxSpeed,
-            @RequestParam Double weight,
-            @RequestParam Integer price
-    ) {
-        Car car = new Car(brand, carModel, maxSpeed, weight, price);
+    public String carsAdd(@ModelAttribute("car") @Valid Car car,
+                          BindingResult result,
+                          Model model) {
+        if (result.hasErrors()) {
+            return "cars/add";
+        }
+
         repository.save(car);
         return "redirect:/cars";
     }
 
     @GetMapping("/{id}")
-    public String carDetails(
-            @PathVariable("id") Long id,
-            Model model
-    ) {
+    public String carDetails(@PathVariable("id") Long id,
+                             Model model) {
         Optional<Car> car = repository.findById(id);
         if (car.isEmpty()) {
             return "redirect:/cars";
@@ -82,36 +77,27 @@ public class CarsController {
             return "redirect:/cars";
         }
 
-        model.addAttribute("edit", car.get());
+        model.addAttribute("edit", id);
+        model.addAttribute("car", car.get());
         return "cars/add";
     }
 
     @PostMapping("/edit/{id}")
-    public String carEdit(
-            @PathVariable Long id,
-            @RequestParam String brand,
-            @RequestParam String carModel,
-            @RequestParam Integer maxSpeed,
-            @RequestParam Double weight,
-            @RequestParam Integer price
-    ) {
-        Car car = repository.findById(id).orElseThrow();
-        car.setBrand(brand);
-        car.setModel(carModel);
-        car.setMaxSpeed(maxSpeed);
-        car.setWeight(weight);
-        car.setPrice(price);
+    public String carEdit(@PathVariable Long id,
+                          @ModelAttribute("car") @Valid Car car,
+                          BindingResult result,
+                          Model model) {
+        if (result.hasErrors()) {
+            model.addAttribute("edit", id);
+            return "cars/add";
+        }
+
         repository.save(car);
         return "redirect:/cars/" + id;
     }
 
     @PostMapping("/delete/{id}")
-    public String carDelete(
-            @PathVariable Long id
-    ) {
-        Car car = repository.findById(id).orElseThrow();
-        Iterable<Customer> child = customersRepository.getByCar(car);
-        customersRepository.deleteAll(child);
+    public String carDelete(@PathVariable Long id) {
         repository.deleteById(id);
         return "redirect:/cars";
     }

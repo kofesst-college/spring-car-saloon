@@ -11,32 +11,32 @@
     <h4 class="mb-3"
         th:text="${edit != null ? 'Изменение заказа' : 'Добавить заказ'}"></h4>
     <form class="needs-validation"
-          th:action="'/customers/' + ${edit != null ? 'edit/' + edit.id : 'add'}"
-          method="post">
-        <input type="hidden" th:value="${edit != null ? edit.id : 0}">
+          th:action="'/customers/' + ${edit != null ? 'edit/' + edit : 'add'}"
+          method="post"
+          th:object="${customer}">
+        <input type="hidden" th:value="${edit != null ? edit : 0}">
         <div class="row g-3">
             <div class="col-md-12">
                 <input type="text" class="form-control" id="firstname" name="firstname" placeholder="Имя заказчика"
-                       th:value="${edit != null ? edit.customerFirstname : ''}" required="">
+                       th:field="*{customerFirstname}"/>
+                <div style="color: red" th:if="${#fields.hasErrors('customerFirstname')}"
+                     th:errors="*{customerFirstname}"></div>
             </div>
             <div class="col-md-12">
                 <input type="text" class="form-control" id="lastname" name="lastname" placeholder="Фамилия заказчика"
-                       th:value="${edit != null ? edit.customerLastname : ''}" required="">
-            </div>
-            <div class="col-md-12">
-                <select class="form-select" id="car" required="" name="carId">
-                    <option value="">Автомобиль...</option>
-                    <option th:each="car : ${cars}" th:value="${car.id}" th:text="${car}"
-                            th:selected="${edit != null ? edit.car.id == car.id : false}"></option>
-                </select>
+                       th:field="*{customerLastname}"/>
+                <div style="color: red" th:if="${#fields.hasErrors('customerLastname')}"
+                     th:errors="*{customerLastname}"></div>
             </div>
             <div class="form-check">
                 <input class="form-check-input" type="checkbox" id="isOnline"
                        name="isOnline"
-                       th:value="${edit != null ? edit.online : false}">
+                       th:field="*{online}"/>>
                 <label class="form-check-label" for="isOnline">
                     Онлайн заказ
                 </label>
+                <div style="color: red" th:if="${#fields.hasErrors('online')}"
+                     th:errors="*{online}"></div>
             </div>
 
             <button class="w-100 btn btn-primary btn-lg" type="submit"

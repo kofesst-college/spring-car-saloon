@@ -10,7 +10,6 @@
 <div th:insert="blocks/header"></div>
 <div class="row">
     <p class="card-text" th:text="'Заказчик ' + ${result.customer}"></p>
-    <p class="card-text" th:text="'Автомобиль ' + ${result.car}"></p>
     <p class="card-text" th:text="${result.online ? 'Онлайн заказ' : 'Оффлайн заказ'}"></p>
     <p class="card-text" th:text="'Совершен ' + ${result.timestamp}"></p>
     <a th:href="'/customers/edit/' + ${result.id}">Редактировать</a>

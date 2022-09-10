@@ -1,6 +1,9 @@
 package me.kofesst.spring.carsaloon.models;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -10,12 +13,15 @@ public class Customer {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotNull(message = "Это обязательное поле")
+    @NotBlank(message = "Поле не может быть пустым")
+    @Size(max = 40, message = "Слишком длинное значение")
     private String customerFirstname;
-    private String customerLastname;
 
-    @ManyToOne
-    @JoinColumn(name = "carId", referencedColumnName = "id")
-    private Car car;
+    @NotNull(message = "Это обязательное поле")
+    @NotBlank(message = "Поле не может быть пустым")
+    @Size(max = 40, message = "Слишком длинное значение")
+    private String customerLastname;
 
     private Date timestamp;
     private Boolean isOnline;
@@ -23,10 +29,9 @@ public class Customer {
     public Customer() {
     }
 
-    public Customer(String customerFirstname, String customerLastname, Car car, Boolean isOnline) {
+    public Customer(String customerFirstname, String customerLastname, Boolean isOnline) {
         this.customerFirstname = customerFirstname;
         this.customerLastname = customerLastname;
-        this.car = car;
         this.isOnline = isOnline;
         this.timestamp = new Date();
     }
@@ -57,18 +62,6 @@ public class Customer {
 
     public String getCustomer() {
         return customerFirstname + " " + customerLastname;
-    }
-
-    public Car getCar() {
-        return car;
-    }
-
-    public void setCar(Car car) {
-        this.car = car;
-    }
-
-    public String getCarDetails() {
-        return car.getBrand() + " " + car.getModel();
     }
 
     public String getTimestamp() {
