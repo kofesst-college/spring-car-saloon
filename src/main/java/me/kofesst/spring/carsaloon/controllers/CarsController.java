@@ -1,16 +1,17 @@
 package me.kofesst.spring.carsaloon.controllers;
 
 import me.kofesst.spring.carsaloon.models.Car;
-import me.kofesst.spring.carsaloon.models.Customer;
 import me.kofesst.spring.carsaloon.repositories.CarsRepository;
 import me.kofesst.spring.carsaloon.repositories.CustomersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.security.Principal;
 import java.util.Optional;
 
 @Controller
@@ -23,9 +24,13 @@ public class CarsController {
     private CustomersRepository customersRepository;
 
     @GetMapping
-    public String carsMain(Model model) {
+    public String carsMain(Model model, Principal principal) {
         Iterable<Car> cars = repository.findAll();
         model.addAttribute("models", cars);
+
+        String username = principal.getName();
+        System.out.println(username);
+
         return "cars/main";
     }
 
